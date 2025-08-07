@@ -1,0 +1,21 @@
+# Ignore sensitive and system files
+.env
+*.log
+*.tmp
+*.bak
+*.swp
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+node_modules/
+vendor/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+composer.lock
+package-lock.json
+# Ignore screenshots and docs if not needed in repo
+#doc/*.png
+#doc/*.jpg
