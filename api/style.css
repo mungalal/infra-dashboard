@@ -1,0 +1,171 @@
+/* --- Brand Theme Colors --- */
+:root {
+  --brand-blue: #2a3f54;
+  --brand-green: #27ae60;
+  --brand-orange: #f39c12;
+  --brand-red: #e74c3c;
+  --brand-gray: #f4f6f8;
+  --brand-dark: #222;
+  --brand-light: #fff;
+  --brand-accent: #6c63ff;
+}
+
+body {
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background: linear-gradient(120deg, var(--brand-blue) 0%, var(--brand-accent) 100%);
+  color: var(--brand-dark);
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  background: var(--brand-blue);
+  color: var(--brand-light);
+  padding: 24px 0 16px 0;
+  text-align: center;
+  position: relative;
+}
+
+.header .brand-logo {
+  width: 60px;
+  height: 60px;
+  border-radius: 16px;
+  background: var(--brand-green);
+  display: inline-block;
+  margin-bottom: 8px;
+  background-image: url('logo.png');
+  background-size: cover;
+  background-position: center;
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 2.2rem;
+  letter-spacing: 2px;
+  font-weight: 600;
+}
+
+.footer {
+  background: var(--brand-blue);
+  color: var(--brand-light);
+  text-align: center;
+  padding: 12px 0;
+  margin-top: auto;
+  font-size: 1rem;
+}
+
+.dashboard-container {
+  background: var(--brand-gray);
+  border-radius: 18px;
+  margin: 32px auto 24px auto;
+  max-width: 1100px;
+  box-shadow: 0 6px 32px rgba(42,63,84,0.12);
+  padding: 36px 32px 32px 32px;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--brand-light);
+  box-shadow: 0 2px 12px rgba(42,63,84,0.07);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.table th, .table td {
+  padding: 14px 12px;
+  text-align: left;
+}
+.table th {
+  background: var(--brand-accent);
+  color: var(--brand-light);
+  font-weight: 600;
+}
+.table tr:nth-child(even) {
+  background: #f7f8fc;
+}
+.table tr:hover {
+  background: #e6f7ff;
+}
+
+.btn {
+  background: var(--brand-green);
+  color: var(--brand-light);
+  border: none;
+  border-radius: 6px;
+  padding: 8px 18px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+  margin: 2px 0;
+}
+.btn:hover {
+  background: var(--brand-orange);
+}
+
+/* Login Form Styling */
+.login-container {
+  max-width: 400px;
+  margin: 60px auto 0 auto;
+  background: var(--brand-light);
+  border-radius: 20px;
+  box-shadow: 0 4px 24px rgba(42,63,84,0.13);
+  padding: 36px 32px 32px 32px;
+}
+.login-container h2 {
+  text-align: center;
+  color: var(--brand-blue);
+  margin-bottom: 22px;
+}
+.login-container input[type="text"],
+.login-container input[type="password"] {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 18px;
+  border: 1px solid #d1d9e6;
+  border-radius: 8px;
+  font-size: 1rem;
+}
+.login-container button {
+  width: 100%;
+}
+
+/* Host Details Table Scrollbar */
+.upgradable-table-container {
+  max-height: 380px;
+  overflow-y: auto;
+  border-radius: 10px;
+  box-shadow: 0 2px 12px rgba(42,63,84,0.07);
+  background: var(--brand-light);
+  margin-bottom: 24px;
+}
+
+/* Custom Scrollbar */
+.upgradable-table-container::-webkit-scrollbar {
+  width: 10px;
+  background: #e6e6e6;
+}
+.upgradable-table-container::-webkit-scrollbar-thumb {
+  background: var(--brand-accent);
+  border-radius: 8px;
+}
+
+/* Multi-color image theme accent */
+.header {
+  background: linear-gradient(90deg, var(--brand-blue) 0%, var(--brand-accent) 60%, var(--brand-green) 100%);
+}
+
+/* Responsive */
+@media (max-width: 700px) {
+  .dashboard-container {
+    padding: 12px 4px;
+  }
+  .table th, .table td {
+    padding: 7px 6px;
+    font-size: 0.95rem;
+  }
+  .header h1 {
+    font-size: 1.4rem;
+  }
+}

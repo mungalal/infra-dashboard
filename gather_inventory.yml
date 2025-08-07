@@ -1,0 +1,91 @@
+---
+- name: Gather host inventory and push to MySQL
+  hosts: all
+  gather_facts: yes
+  become: yes
+
+  tasks:
+    - name: Gather package facts (works on Debian and RedHat)
+      package_facts:
+        manager: auto
+
+    - name: Gather installed packages using rpm (RedHat fallback)
+      shell: rpm -qa --qf '%{NAME} %{VERSION}-%{RELEASE}\n'
+      register: rpm_packages
+      when: ansible_os_family == "RedHat" and (ansible_facts.packages is not defined or ansible_facts.packages|length == 0)
+
+    - name: Parse rpm packages (RedHat fallback)
+      set_fact:
+        rpm_pkgs_dict: "{{ dict(rpm_packages.stdout_lines | map('split', ' ') | map('first') | zip(rpm_packages.stdout_lines | map('split', ' ') | map('last'))) }}"
+      when: ansible_os_family == "RedHat" and (ansible_facts.packages is not defined or ansible_facts.packages|length == 0)
+
+    - name: Get list of upgradable packages (Debian)
+      command: apt list --upgradable
+      register: debian_upgrades
+      changed_when: false
+      when: ansible_os_family == "Debian"
+
+    - name: Get upgradable packages (RedHat)
+      shell: |
+        yum -q check-update | awk '/^[a-zA-Z0-9._+-]+[[:space:]]+[0-9a-zA-Z._:+-]+/ {print $1 " " $2}'
+      register: redhat_upgrades_simple
+      changed_when: false
+      failed_when: false
+      when: ansible_os_family == "RedHat"
+
+    - name: Build upgradable_pkgs (RedHat)
+      set_fact:
+        upgradable_pkgs: "{{ upgradable_pkgs | default([]) + [ {'name': item.split(' ')[0], 'version': item.split(' ')[1]} ] }}"
+      loop: "{{ redhat_upgrades_simple.stdout_lines }}"
+      when: ansible_os_family == "RedHat" and item.split(' ')|length == 2
+
+    - name: Initialize upgradable_pkgs_dict
+      set_fact:
+        upgradable_pkgs_dict: {}
+      when: ansible_os_family == "RedHat"
+
+    - name: Ensure upgradable_pkgs is defined (RedHat)
+      set_fact:
+        upgradable_pkgs: []
+      when: ansible_os_family == "RedHat" and upgradable_pkgs is not defined
+
+    - name: Add upgradable package to dict (RedHat)
+      set_fact:
+        upgradable_pkgs_dict: "{{ upgradable_pkgs_dict | combine({ item.name: [ { 'version': item.version } ] }) }}"
+      loop: "{{ upgradable_pkgs | default([]) }}"
+      when: ansible_os_family == "RedHat"
+
+    - name: Gather uptime
+      shell: cat /proc/uptime | awk '{print $1}'
+      register: host_uptime
+      changed_when: false
+      when: ansible_os_family in ["RedHat", "Debian"]
+
+    - name: Set environment fact (from group or host var, or default)
+      set_fact:
+        host_environment: "{{ environment | default('production') }}"
+
+    - name: Prepare inventory data
+      set_fact:
+        host_inventory: |
+          {
+            "hostname": "{{ ansible_hostname }}",
+            "os_family": "{{ ansible_os_family }}",
+            "os_version": "{{ ansible_distribution_version }}",
+            "uptime": "{{ host_uptime.stdout | default('') }}",
+            "environment": "{{ host_environment }}",
+            "packages": {{ (ansible_facts.packages if ansible_os_family == 'Debian' else upgradable_pkgs_dict) | to_json }},
+            "upgradable": {{ (debian_upgrades.stdout_lines | default([]) if ansible_os_family == 'Debian' else upgradable_pkgs) | to_json }},
+            "ip": "{{ ansible_default_ipv4.address }}"
+          }
+
+    - name: POST inventory to PHP API
+      uri:
+        url: "http://db.home.com/api/ingest.php"
+        method: POST
+        body: "{{ host_inventory }}"
+        body_format: json
+        headers:
+          Content-Type: "application/json"
+          X-API-Key: "vibe-inventory-demo-key"
+      delegate_to: localhost
