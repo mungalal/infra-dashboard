@@ -1,4 +1,4 @@
-# Cognizant Host Inventory Dashboard
+# Host Inventory Dashboard
 
 A modern, secure, and user-friendly dashboard for Linux patch management and host inventory, integrating Ansible automation, PHP/MySQL backend, and a Cognizant-branded responsive UI.
 
